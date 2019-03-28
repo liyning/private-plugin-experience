@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>echart实现环状图</title>
+	<script type="text/javascript" src="jquery1_12_3.min.js"></script>
+	<script type="text/javascript" src="echarts.common.min.js"></script>
+	<script type="text/javascript" src="d3.v4.min.js"></script>
+	<script type="text/javascript" src="d3pie.js"></script>
+	<script type="text/javascript" src="d3_private_linechart.js"></script>
+	<script type="text/javascript" src="d3_private_barchart.js"></script>
+	<script type="text/javascript" src="d3_private_pie.js"></script>
+
+</head>
+<style type="text/css">
+	body{
+		background: #0F3E6F;
+		color:#FFF;
+	}
+	.ring {
+	    width: 300px;
+	    height: 300px;
+	    margin-left: 80px;
+	    margin-top: -50px;
+	}
+	#d3_line, #d3_bar{
+		width: 480px;
+    	height: 220px;
+	}
+	.axis text,.legend_name_g text {
+	    fill: #FFF;
+	    font-size: 12px;
+	}
+	 #d3_pie {
+	 	width: 212px;
+	 	height: 212px;
+	 }
+</style>
+<body>
+	<div class="ring" id="ring"></div>
+	<div id="d3_line"></div>
+	<div id="d3_bar"></div>
+	<div id="d3_pie"></div>
+</body>
+<script type="text/javascript">
+
+/*
+
+echart生成环状图
+
+*/
+function echartRing(){
+	var myChart = echarts.init(document.getElementById('ring'));
+// 指定图表的配置项和数据
+	var option = {
+        tooltip: {
+            trigger: 'item',
+            formatter: "{a} <br/>{b}: {c} ({d}%)"
+        },
+        color:['#c75254','#cfb648','#78d6cd'],
+        title: {
+            text: '节点状态',
+            x: 'center',
+            y: 'center',
+            textStyle : {
+                color : '#fff',
+                fontSize : 14
+            }
+        },
+        series: [
+            {
+                name:'节点状态',
+                type:'pie',
+                radius: ['40%', '50%'],
+                avoidLabelOverlap: false,
+                hoverAnimation: false, //移动放大
+                clockwise: false, //逆时针
+                // itemStyle : labelFromatter,
+                data:[{
+                    value:10,
+                    name:"离线"
+                },{
+                    value:5,
+                    name:"告警"
+                },
+                    {
+                        value:4,
+                        name:"在线"
+                    }
+
+                ]
+            }
+        ]
+	};
+// 使用刚指定的配置项和数据显示图表。
+	myChart.setOption(option);
+}
+echartRing();
+
+//d3.v4生成折线图
+function getLineCharts() {
+    var DataOptions = {
+        'containerId':'d3_line',
+        'data':{
+            "data_arr":[
+                {"day":"3月22日","node_a":0,"node_b":3,"node_c":4,"node_d":2,"node_e":7},
+                {"day":"3月23日","node_a":5,"node_b":12,"node_c":54,"node_d":1,"node_e":65},
+                {"day":"3月24日","node_a":7,"node_b":12,"node_c":34,"node_d":54,"node_e":52},
+                {"day":"3月25日","node_a":13,"node_b":33,"node_c":23,"node_d":23,"node_e":26},
+                {"day":"3月26日","node_a":27,"node_b":35,"node_c":54,"node_d":12,"node_e":38},
+                {"day":"3月27日","node_a":20,"node_b":23,"node_c":65,"node_d":65,"node_e":63},
+                {"day":"3月28日","node_a":2,"node_b":12,"node_c":31,"node_d":32,"node_e":91}
+            ],
+            "host_name_map":
+                {
+                    "node_a":"节点1",
+                    "node_b":"节点2",
+                    "node_c":"节点3",
+                    "node_d":"节点4",
+                    "node_e":"节点5"
+                },
+            "maxValueUnit":"条",
+            "maxFlag":false
+        },
+        'colorArr':["#9B69FB","#9EC935","#73E5FD","#FA8356","#466928"],
+        'margin':{top: 30, right: 35, bottom: 60, left: 40},
+        'legendWidth':'10',
+        'axisName' : ["告警条数/条","天"],
+        'legendPosition':false,//右侧图示
+        'leftPosition':'0',
+        'topPosition':'0',
+        'unit':"条",
+        'order':false,
+        'titleHeight':'0',
+        'hasMaxY':false,
+        'defaultY':100,
+        'hasArea':true,
+        'hasPoint':true,
+        'wholeTickShow':true,
+        'hasOddNum':false,
+        'hasTitleIcon':true,
+        'topTipX':20,
+        'xDomain':[1,8],//默认的x的比例尺的自变量
+        'yDomain':[1,100]//默认的y比例尺的自变量
+    };
+
+    lineChartFun(DataOptions,function(){});
+}
+getLineCharts();
+
+//d3.v4生成柱状图
+function getBarCharts() {
+    d3_barchart({
+        'containerId': 'd3_bar',
+        'data': [
+            {'name':'3月22日','frequency':53},
+            {'name':'3月23日','frequency':23},
+            {'name':'3月24日','frequency':33},
+            {'name':'3月25日','frequency':59},
+            {'name':'3月26日','frequency':83},
+            {'name':'3月27日','frequency':3},
+            {'name':'3月28日','frequency':73}
+        ],
+        'legendWidth':0,
+        'margin':{top: 25, right:20, bottom: 20, left: 50},
+        'axisName': ["告警条数/条","天"],
+        'titleHeight':0,
+        'defaultY':100,
+        'unit':'条',
+        'hasMaxY':false,
+        'yDomain': [1, 100]
+    })
+}
+getBarCharts();
+
+//d3.v4生成饼图
+// getPieCharts({
+//         contain:'tampered',
+//         title: '24小时提交更改',
+//         paramModel:"tampered",
+//         color:"#73E5FD",
+//         data: [{
+//             "label":'24小时提交更改',
+//             "value":0.80 * 100,
+//             "color":'#73E5FD'
+//         },{
+//             "label":'',
+//             "value":0.20 * 100,
+//             "color":'#1C2913'
+//         }],
+//         maindata: {
+//             "label":'24小时提交更改',
+//             "value":0.80 * 100,
+//             "color":'#73E5FD'
+//         }
+//     });
+//获取饼状图
+function getPieCharts() {
+    /*饼图主函数*/
+    var paramPieObject = {
+        "containerId":"d3_pie",
+        "header":{
+            "title":"24小时提交更改",
+            "maindata":{
+	            "label":'24小时提交更改',
+	            "value":0.80 * 100,
+	            "color":'#73E5FD'
+	        }
+        },
+        "paramModel":"d3_pie",
+        "size":{
+            "width":parseFloat(d3.select("#d3_pie").style("width").substring(0,d3.select("#d3_pie").style("width").length - 2)),
+            // "width":200,
+            "height":parseFloat(d3.select("#d3_pie").style("height").substring(0,d3.select("#d3_pie").style("height").length - 2))
+            // "height":200
+        },
+        "data":{
+	            "content":[{
+	            "label":'24小时提交更改',
+	            "value":0.80 * 100,
+	            "color":'#73E5FD'
+	        },{
+	            "label":'',
+	            "value":0.20 * 100,
+	            "color":'#1C2913'
+	        }]
+        }
+    };
+    piechartFun(paramPieObject);
+}
+getPieCharts();
+</script>
+</html>
